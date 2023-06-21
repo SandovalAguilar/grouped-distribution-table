@@ -9,14 +9,16 @@ class grouped_table:
         self.simple_range = self.df.max() - self.df.min()
         self.length = self.df.shape[0]
         self.column_name = self.df.columns[0]
+        self.number_classes = self.calculate_number_classes()
+        self.amplitude = self.calculate_amplitude()
          
-    def calculate_number_classes(self, length):
+    def calculate_number_classes(self):
         self.number_classes = int(np.ceil(np.sqrt(self.length))) if self.length < 30 else int(np.ceil(1 + (3.322 * np.log10(self.length))))
         return self.number_classes
 
-    def calculate_amplitude(self, simple_range, number_classes):
-        self.amplitude = simple_range / number_classes
-        return self.amplitude
+    def calculate_amplitude(self):
+        self.amplitude = self.simple_range / self.number_classes
+        return self.amplitude 
     
     def generate_intervals(self):
         pass
