@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np 
 
-class grouped_table:
+class groupedTable:
 
     def __init__(self, name: str, source_file: str):
         self.name = name
