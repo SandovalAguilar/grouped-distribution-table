@@ -23,38 +23,42 @@ class groupedTable:
         return self.amplitude 
     
     def generate_intervals(self):
-        array_intervals = np.empty((self.number_classes, 2), dtype=float)
-        array_intervals[0][0] = self.df.min().iloc[0] 
-        array_intervals[0][1] = self.df.min().iloc[0] + self.amplitude.iloc[0]
+        self.array_intervals = np.empty((self.number_classes, 2), dtype=float)
+        self.array_intervals[0][0] = self.df.min().iloc[0] 
+        self.array_intervals[0][1] = self.df.min().iloc[0] + self.amplitude.iloc[0]
         aux_col1 = self.df.min().iloc[0]
         aux_col2 = self.df.min().iloc[0] + self.amplitude.iloc[0]
 
-        for i in range(1,self.number_classes):
+        for i in range(1, self.number_classes):
             aux_col1 += self.amplitude
-            array_intervals[i][0] = aux_col1.iloc[0]
+            self.array_intervals[i][0] = aux_col1.iloc[0]
                 
-        for i in range(1,self.number_classes):
+        for i in range(1, self.number_classes):
             aux_col2 += self.amplitude
-            array_intervals[i][1] = aux_col2.iloc[0]
-        
-        '''
-        array_intervals = [array_intervals[i][0] = (aux_col1 := aux_col1 + amplitud).iloc[0] for i in range(1, self.number_classes)]
-        array_intervals = [array_intervals[i][1] = (aux_col2 := aux_col2 + amplitud).iloc[0] for i in range(1, self.number_classes)]
-        '''    
+            self.array_intervals[i][1] = aux_col2.iloc[0]
 
         return self.array_intervals
 
-    def count_range_in_list(array, interval):
-        for i in array:
-            if i != array[-1]:
-                if interval[0] <= i < interval[1]:
-                    counts += 1
-            else:
-                if interval[0] <= i <= interval[1]:
-                    counts += 1
-        
-        return counts
-
     def generate_abs_freq(self):
+        self.array_abs_freq = np.empty((self.number_classes), dtype = int)
+
+        def count_range_in_list(array, interval):
+            counts = 0
+
+            for i in array:
+                print(i)
+                if np.float32(i) != np.float32(array[-1]):
+                    if np.float32(interval[0]) <= np.float32(i) < np.float32(interval[1]):
+                        counts += 1
+                    else:
+                        if np.float32(interval[0]) <= np.float32(i) <= np.float32(interval[1]):
+                            counts += 1
+
+                return counts
+  
         for i in range(self.number_classes):
-	        self.array_abs_freq[i] = self.count_range_in_list(self.df[self.df.columns[0]].values, self.array_classes[i])
+            self.array_abs_freq[i] = count_range_in_list(self.df[self.column_name].values, self.array_intervals[i])
+                
+        return self.array_abs_freq
+
+
