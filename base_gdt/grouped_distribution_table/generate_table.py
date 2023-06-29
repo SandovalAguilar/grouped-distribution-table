@@ -13,7 +13,7 @@ class groupedTable:
         self.amplitude = self.calculate_amplitude()
         self.array_intervals = self.generate_intervals()
         self.array_abs_freq = self.generate_abs_freq()
-         
+    
     def calculate_number_classes(self):
         self.number_classes = int(np.ceil(np.sqrt(self.length))) if self.length < 30 else int(np.ceil(1 + (3.322 * np.log10(self.length))))
         return self.number_classes
@@ -39,26 +39,32 @@ class groupedTable:
 
         return self.array_intervals
 
+    def last_interval(self, array, interval):
+        counts = 0
+        for i in array:
+            if np.float32(interval[0]) <= np.float32(i) <= np.float32(interval[1]):
+                counts += 1
+        
+        return counts
+
+    def count_range_in_list(self, array, interval):
+        counts = 0
+
+        for i in array:
+            if np.float32(i) != np.float32(array[-1]):
+                if np.float32(interval[0]) <= np.float32(i) < np.float32(interval[1]):
+                    counts += 1
+
+        return counts
+
     def generate_abs_freq(self):
         self.array_abs_freq = np.empty((self.number_classes), dtype = int)
-
-        def count_range_in_list(array, interval):
-            counts = 0
-
-            for i in array:
-                print(i)
-                if np.float32(i) != np.float32(array[-1]):
-                    if np.float32(interval[0]) <= np.float32(i) < np.float32(interval[1]):
-                        counts += 1
-                    else:
-                        if np.float32(interval[0]) <= np.float32(i) <= np.float32(interval[1]):
-                            counts += 1
-
-                return counts
   
         for i in range(self.number_classes):
-            self.array_abs_freq[i] = count_range_in_list(self.df[self.column_name].values, self.array_intervals[i])
-                
+            self.array_abs_freq[i] = self.count_range_in_list(self.df[self.column_name].values, self.array_intervals[i])
+        
+        self.array_abs_freq[-1] = self.last_interval(self.df[self.column_name].values, self.array_intervals[-1])
+
         return self.array_abs_freq
 
 
