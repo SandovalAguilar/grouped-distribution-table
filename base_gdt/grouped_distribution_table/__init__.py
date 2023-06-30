@@ -1,1 +1,1 @@
-from grouped_distribution_table.generate_table import groupedTable
+from grouped_distribution_table.table import groupedTable

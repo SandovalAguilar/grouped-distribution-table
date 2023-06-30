@@ -1,39 +1,50 @@
-class centralMeasures():
-    
-    def grouped_mean(tabla_frecuencias, n):
-        tabla_frecuencias['x_i * f_i'] = tabla_frecuencias['Marca de clase'] * tabla_frecuencias['Frecuencia absoluta']
-        sum_xifi = float(tabla_frecuencias['x_i * f_i'].sum())
-        media_agrupada = sum_xifi / n
-        return media_agrupada
-    
-    def mode_class(tabla_frecuencias):
-        clase = 0
-        frecuencia_mayor = tabla_frecuencias['Frecuencia absoluta'].max()
+import pandas as pd
+import numpy as np
+import table as t
 
-        for i in tabla_frecuencias['Frecuencia absoluta']:
-                clase += 1
-                if i == frecuencia_mayor:
-                    return clase
-
-    def grouped_mode(moda_clase, amplitud, tabla_frecuencias, intervalos_float):
-        limite_inferior = min(intervalos_float[moda_clase - 1]) 
-        delta_1 = tabla_frecuencias['Frecuencia absoluta'].iloc[moda_clase - 1] - tabla_frecuencias['Frecuencia absoluta'].iloc[moda_clase - 2]
-        delta_2 = tabla_frecuencias['Frecuencia absoluta'].iloc[moda_clase - 1] - tabla_frecuencias['Frecuencia absoluta'].iloc[moda_clase]
-        moda_agrupada = limite_inferior + ((delta_1) / (delta_1 + delta_2)) * amplitud
-        return moda_agrupada
+class centralMeasures(t.groupedTable):
     
-    def median_class(n, tabla_frecuencias):
-        posicion = (n + 1) / 2
-        clase = 0
+    def __init__(self, name: str, source_file: str):
+         super().__init__(name, source_file)
+         self.grouped_mean = self.calculate_grouped_mean()
+         self.mode_class = self.calculate_mode_class()
+         self.grouped_mode = self.calculate_grouped_mode()
+         self.median_class = self.calculate_median_class()
 
-        posicion_clase = next((clase + 1 for clase, frecuencia_acumulada in enumerate(tabla_frecuencias['Frecuencia acumulada']) if frecuencia_acumulada>=posicion), None)
+    def calculate_grouped_mean(self):
+        self.table['x_i * f_i'] = self.table['Mark class'] * self.table['Absolute frequency']
+        sum_xifi = float(self.table['x_i * f_i'].sum())
+        self.grouped_mean = sum_xifi / self.length
         
-        return posicion_clase
+        return self.grouped_mean
+    
+    def calculate_mode_class(self):
+        class_number = 0
+        higher_freq = self.table['Absolute frecuency'].max()
 
-    def grouped_median(mediana_clase, amplitud, tabla_frecuencias, intervalos_float):
-        limite_inferior = min(intervalos_float[mediana_clase - 1]) 
-        frec_acum_anterior = tabla_frecuencias['Frecuencia acumulada'].iloc[mediana_clase - 2]
-        frec_absoluta = tabla_frecuencias['Frecuencia absoluta'].iloc[mediana_clase -1]
-        mediana_agrupada = limite_inferior + (((n / 2) - frec_acum_anterior) / frec_absoluta ) * amplitud
+        for i in self.table['Absolute frecuency']:
+                class_number += 1
+                if i == higher_freq:
+                    return class_number
 
-        return mediana_agrupada
+    def calculate_grouped_mode(self):
+        lower_limit = min(self.array_intervals[self.class_mode - 1]) 
+        delta_1 = self.table['Absolute frecuency'].iloc[self.class_mode - 1] - self.table['Absolute frecuency'].iloc[self.class_mode - 2]
+        delta_2 = self.table['Absolute frecuency'].iloc[self.class_mode - 1] - self.table['Absolute frecuency'].iloc[self.class_mode]
+        self.grouped_mode = lower_limit + ((delta_1) / (delta_1 + delta_2)) * self.amplitude
+        return self.grouped_mode
+    
+    def calculate_median_class(self):
+        position = (self.length + 1) / 2
+
+        self.median_class = next((class_number + 1 for class_number, cumulative_freq in enumerate(self.table['Cumulative frequency']) if cumulative_freq >= position), None)
+        
+        return self.median_class
+
+    def calculate_grouped_median(self):
+        lower_limit = min(self.array_intervals[self.median_class - 1]) 
+        prev_cum_freq = self.table['Cumulative frequency'].iloc[self.median_class - 2]
+        absolute_freq = self.table['Absolute frecuency'].iloc[self.median_class - 1]
+        self.grouped_median = lower_limit + (((self.length / 2) - prev_cum_freq) / absolute_freq ) * self.amplitude
+
+        return self.grouped_median
