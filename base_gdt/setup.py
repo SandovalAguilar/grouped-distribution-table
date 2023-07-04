@@ -13,7 +13,7 @@ LONG_DESCRIPTION = 'A package that allows you to generate a grouped frequency di
 
 # Setting up
 setup(
-    name="grouped-distribution-table",
+    name="grouped_distribution_table",
     version=VERSION,
     author="Ismael Sandoval, Mauricio Ponce",
     author_email="ismael.sandoval.aguilar@gmail.com, maupon2004@gmail.com",

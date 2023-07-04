@@ -126,3 +126,10 @@ class groupedTable:
         self.table = self.table.set_index(self.column_name)
 
         return self.table
+
+    # Functions for central measures
+    def calculate_grouped_mean(self):
+        from measures.central_measures import calculate_grouped_mean
+
+        return calculate_grouped_mean(self)
+
