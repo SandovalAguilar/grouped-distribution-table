@@ -1,5 +1,5 @@
 import pandas as pd
-import numpy as np 
+import numpy as np
 
 class groupedTable:
 
@@ -19,26 +19,28 @@ class groupedTable:
         self.array_class_mark = self.generate_class_mark()
         self.array_percentage = self.generate_percentage_col()
         self.table = self.generate_table()
-    
+
     def calculate_number_classes(self):
-        self.number_classes = int(np.ceil(np.sqrt(self.length))) if self.length < 30 else int(np.ceil(1 + (3.322 * np.log10(self.length))))
+        self.number_classes = int(np.ceil(np.sqrt(self.length))) if self.length < 30 else int(
+            np.ceil(1 + (3.322 * np.log10(self.length))))
         return self.number_classes
 
     def calculate_amplitude(self):
         self.amplitude = self.simple_range / self.number_classes
-        return self.amplitude 
-    
+        return self.amplitude
+
     def generate_intervals(self):
         self.array_intervals = np.empty((self.number_classes, 2), dtype=float)
-        self.array_intervals[0][0] = self.df.min().iloc[0] 
-        self.array_intervals[0][1] = self.df.min().iloc[0] + self.amplitude.iloc[0]
+        self.array_intervals[0][0] = self.df.min().iloc[0]
+        self.array_intervals[0][1] = self.df.min().iloc[0] + \
+            self.amplitude.iloc[0]
         aux_col1 = self.df.min().iloc[0]
         aux_col2 = self.df.min().iloc[0] + self.amplitude.iloc[0]
 
         for i in range(1, self.number_classes):
             aux_col1 += self.amplitude
             self.array_intervals[i][0] = aux_col1.iloc[0]
-                
+
         for i in range(1, self.number_classes):
             aux_col2 += self.amplitude
             self.array_intervals[i][1] = aux_col2.iloc[0]
@@ -52,7 +54,7 @@ class groupedTable:
         for i in array:
             if np.float32(interval[0]) <= np.float32(i) <= np.float32(interval[1]):
                 counts += 1
-        
+
         return counts
 
     # This function only counts the frequency of a value given an interval
@@ -67,17 +69,19 @@ class groupedTable:
         return counts
 
     def generate_abs_freq(self):
-        self.array_abs_freq = np.empty((self.number_classes), dtype = int)
-  
+        self.array_abs_freq = np.empty((self.number_classes), dtype=int)
+
         for i in range(self.number_classes):
-            self.array_abs_freq[i] = self.count_range_in_list(self.df[self.column_name].values, self.array_intervals[i])
-        
-        self.array_abs_freq[-1] = self.count_last_interval(self.df[self.column_name].values, self.array_intervals[-1])
+            self.array_abs_freq[i] = self.count_range_in_list(
+                self.df[self.column_name].values, self.array_intervals[i])
+
+        self.array_abs_freq[-1] = self.count_last_interval(
+            self.df[self.column_name].values, self.array_intervals[-1])
 
         return self.array_abs_freq
-    
+
     def generate_acum_freq(self):
-        self.array_acum_freq = np.empty((self.number_classes), dtype = int)
+        self.array_acum_freq = np.empty((self.number_classes), dtype=int)
         aux = 0
 
         for i in range(self.number_classes):
@@ -85,34 +89,35 @@ class groupedTable:
             self.array_acum_freq[i] = aux
 
         return self.array_acum_freq
-    
+
     def generate_rel_abs_freq(self):
         self.array_rel_abs_freq = self.array_abs_freq / self.length
 
         return self.array_rel_abs_freq
-    
+
     def generate_rel_acum_freq(self):
         self.array_rel_acum_freq = self.array_acum_freq / self.length
 
         return self.array_rel_acum_freq
 
     def generate_class_mark(self):
-        self.array_class_mark = np.empty((self.number_classes), dtype = float)
+        self.array_class_mark = np.empty((self.number_classes), dtype=float)
 
         for i in range(self.number_classes):
-            self.array_class_mark[i] = np.sum(self.array_intervals[i], dtype = float) / 2
+            self.array_class_mark[i] = np.sum(
+                self.array_intervals[i], dtype=float) / 2
 
         return self.array_class_mark
-    
+
     def generate_percentage_col(self):
         self.array_percentage = self.array_rel_abs_freq * 100
 
         return self.array_percentage
-    
+
     # Takes all the arrays and turns it into a dataframe
     def generate_table(self):
         table_dic = {
-            self.column_name: np.arange(1, self.number_classes + 1, dtype = int),
+            self.column_name: np.arange(1, self.number_classes + 1, dtype=int),
             'Intervals': [str(np.around(i, 2)) for i in self.array_intervals],
             'Absolute frequency': self.array_abs_freq,
             'Cumulative frequency': self.array_acum_freq,
@@ -122,14 +127,33 @@ class groupedTable:
             'Percentage': self.array_percentage
         }
 
-        self.table = pd.DataFrame(data = table_dic)
+        self.table = pd.DataFrame(data=table_dic)
         self.table = self.table.set_index(self.column_name)
 
         return self.table
 
     # Functions for central measures
     def calculate_grouped_mean(self):
-        from measures.central_measures import calculate_grouped_mean
+        from measures.central_measures import centralMeasures
 
-        return calculate_grouped_mean(self)
+        return centralMeasures.calculate_grouped_mean(self)
 
+    def calculate_mode_class(self):
+        from measures.central_measures import centralMeasures
+
+        return centralMeasures.calculate_mode_class(self)
+
+    def calculate_grouped_mode(self):
+        from measures.central_measures import centralMeasures
+
+        return centralMeasures.calculate_grouped_mode(self)
+
+    def calculate_median_class(self):
+        from measures.central_measures import centralMeasures
+
+        return centralMeasures.calculate_median_class(self)
+
+    def calculate_grouped_median(self):
+        from measures.central_measures import centralMeasures
+
+        return centralMeasures.calculate_grouped_median(self)
